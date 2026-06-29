@@ -98,12 +98,12 @@ body {
   height: auto;
   display: block;
   object-fit: contain;
-  filter: brightness(0) invert(1) drop-shadow(0 1px 10px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.3));
   transition: filter 0.3s, opacity 0.3s;
 }
 
 .site-header.scrolled .logo-wordmark {
-  filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(168, 118, 42, 0.14));
+  filter: drop-shadow(0 1px 8px rgba(168, 118, 42, 0.14));
 }
 /* ── Glass Pill Icons ── */
 .header-icons {
@@ -714,7 +714,7 @@ body.cart-open {
   height: auto;
   display: block;
   object-fit: contain;
-  filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
+  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
 }
 .sidebar-close {
   width: 40px;
@@ -7901,7 +7901,7 @@ body.cart-open {
   height: auto;
   display: block;
   object-fit: contain;
-  filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
+  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
 }
 .footer-top-right {
   position: absolute;
