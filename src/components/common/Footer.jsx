@@ -29,16 +29,7 @@ export default function Footer() {
             <div className="footer-logo-circle">
               <img src="/img/logo.png" alt="Aromus Logo" />
             </div>
-            <div className="footer-logo-text">
-              <span className="footer-logo-aromus">AROMUS</span>
-              <span className="footer-logo-divider">
-                <span className="footer-logo-line" />
-                <span className="footer-logo-gem">✦</span>
-                <span className="footer-logo-line" />
-              </span>
-              <span className="footer-logo-parfum">PARFUM</span>
-              <span className="footer-logo-essence">Essence of Elegance</span>
-            </div>
+            <img className="footer-logo-wordmark" src="/img/logotext.png" alt="Aromus Parfum" />
           </div>
         </div>
 

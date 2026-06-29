@@ -73,8 +73,7 @@ body {
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(168, 118, 42, 0.42);
-  display: flex;
+    display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
@@ -94,88 +93,18 @@ body {
   box-shadow: 0 4px 20px rgba(168, 118, 42, 0.32);
 }
 
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
+.logo-wordmark {
+  width: clamp(112px, 12vw, 148px);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 1px 10px rgba(0, 0, 0, 0.3));
+  transition: filter 0.3s, opacity 0.3s;
 }
 
-.logo-aromus {
-  font-family: 'Cinzel', serif;
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  color: #FAF0E0;
-  line-height: 1;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
-  transition: color 0.3s, text-shadow 0.3s;
+.site-header.scrolled .logo-wordmark {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(168, 118, 42, 0.14));
 }
-
-/* Decorative divider: line ✦ line */
-.logo-divider {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-  margin: 3px 0 2px;
-}
-
-.logo-divider-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 150, 62, 0.55), transparent);
-  transition: opacity 0.3s;
-}
-
-.logo-divider-gem {
-  font-size: 7px;
-  color: #C9963E;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.3s;
-}
-
-.logo-parfum {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.44em;
-  color: #C9A87A;
-  text-transform: uppercase;
-  line-height: 1;
-  transition: color 0.3s;
-}
-
-.logo-essence {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 6.5px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: rgba(201, 168, 122, 0.65);
-  text-transform: uppercase;
-  margin-top: 2px;
-  transition: color 0.3s;
-}
-
-/* Scrolled logo states */
-.site-header.scrolled .logo-aromus {
-  color: var(--gold);
-  text-shadow: none;
-}
-.site-header.scrolled .logo-divider-line {
-  background: linear-gradient(90deg, transparent, rgba(168, 118, 42, 0.4), transparent);
-}
-.site-header.scrolled .logo-divider-gem {
-  color: var(--gold);
-}
-.site-header.scrolled .logo-parfum {
-  color: var(--text-muted);
-}
-.site-header.scrolled .logo-essence {
-  color: rgba(92, 68, 40, 0.6);
-}
-
 /* ── Glass Pill Icons ── */
 .header-icons {
   display: flex;
@@ -771,7 +700,7 @@ body.cart-open {
   text-decoration: none;
 }
 
-.sidebar-brand img {
+.sidebar-brand > img:first-child {
   width: 54px;
   height: 54px;
   object-fit: contain;
@@ -779,25 +708,14 @@ body.cart-open {
   border: 1px solid rgba(201, 150, 62, 0.55);
 }
 
-.sidebar-brand span {
-  display: flex;
-  flex-direction: column;
+.sidebar-brand-wordmark {
+  width: 140px;
+  max-width: 44vw;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
 }
-
-.sidebar-brand strong {
-  font-family: 'Cinzel', serif;
-  font-size: 18px;
-  letter-spacing: 0.22em;
-}
-
-.sidebar-brand small {
-  margin-top: 4px;
-  color: #c9a87a;
-  font-size: 7px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
 .sidebar-close {
   width: 40px;
   height: 40px;
@@ -1215,8 +1133,8 @@ body.cart-open {
     height: 41px;
   }
 
-  .logo-aromus {
-    font-size: 16px;
+  .logo-wordmark {
+    width: 112px;
   }
 
   .site-sidebar {
@@ -1233,9 +1151,14 @@ body.cart-open {
     padding: 14px 16px;
   }
 
-  .sidebar-brand img {
+  .sidebar-brand > img:first-child {
     width: 48px;
     height: 48px;
+  }
+
+  .sidebar-brand-wordmark {
+    width: 122px;
+    max-width: 38vw;
   }
 
   .sidebar-content {
@@ -7973,63 +7896,13 @@ body.cart-open {
   object-fit: contain;
 }
 
-.footer-logo-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
+.footer-logo-wordmark {
+  width: clamp(132px, 15vw, 170px);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.24));
 }
-
-.footer-logo-aromus {
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  color: #FAF0E0;
-  line-height: 1;
-}
-
-.footer-logo-divider {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-  margin: 3px 0 2px;
-}
-
-.footer-logo-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 150, 62, 0.5), transparent);
-}
-
-.footer-logo-gem {
-  font-size: 7px;
-  color: #C9963E;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.footer-logo-parfum {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.44em;
-  color: #C9A87A;
-  text-transform: uppercase;
-  line-height: 1;
-}
-
-.footer-logo-essence {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 6.5px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: rgba(201, 168, 122, 0.55);
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
 .footer-top-right {
   position: absolute;
   top: 0;

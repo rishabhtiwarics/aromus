@@ -153,16 +153,7 @@ export default function Header() {
             <div className="logo-circle">
               <img src="/img/logo.png" alt="Aromus Logo" />
             </div>
-            <div className="logo-text">
-              <span className="logo-aromus">AROMUS</span>
-              <span className="logo-divider">
-                <span className="logo-divider-line" />
-                <span className="logo-divider-gem">✦</span>
-                <span className="logo-divider-line" />
-              </span>
-              <span className="logo-parfum">PARFUM</span>
-              <span className="logo-essence">Essence of Elegance</span>
-            </div>
+            <img className="logo-wordmark" src="/img/logotext.png" alt="Aromus Parfum" />
           </Link>
 
           <div className="header-icons">
@@ -391,10 +382,7 @@ export default function Header() {
           <div className="sidebar-top-content">
             <Link to="/" className="sidebar-brand" onClick={closeSidebar}>
               <img src="/img/logo.png" alt="" />
-              <span>
-                <strong>AROMUS</strong>
-                <small>Essence of Elegance</small>
-              </span>
+              <img className="sidebar-brand-wordmark" src="/img/logotext.png" alt="Aromus Parfum" />
             </Link>
             <button className="sidebar-close" type="button" aria-label="Close menu" onClick={closeSidebar}>
               <i className="bi bi-x-lg" />
