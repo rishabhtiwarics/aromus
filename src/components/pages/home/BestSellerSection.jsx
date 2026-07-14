@@ -11,7 +11,7 @@ import 'swiper/css/navigation';
 export default function BestSellerSection() {
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.products);
-  const products = items.slice(0, 7);
+  const products = items.filter((product) => product.isBestSeller).slice(0, 7);
 
   useEffect(() => {
     if (status === 'idle') dispatch(loadProducts());

@@ -7,14 +7,8 @@ import CommerceHero from '../../common/CommerceHero';
 import ServiceFeatures from '../home/ServiceFeatures';
 import ProductGallery from './ProductGallery';
 import ProductComments from './ProductComments';
-import { loadProducts } from '../../../store/productsSlice';
+import { loadProduct } from '../../../store/productsSlice';
 import { addToCart, selectIsInCart } from '../../../store/cartSlice';
-
-const BOTTLE_SIZES = [
-  { label: '30 ml', multiplier: 0.72 },
-  { label: '50 ml', multiplier: 1 },
-  { label: '100 ml', multiplier: 1.65 },
-];
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('en-IN', {
@@ -24,18 +18,17 @@ const formatPrice = (value) =>
   }).format(value);
 
 export default function ProductDetailsPage() {
-  const { productId } = useParams();
+  const { productSlug } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items, status } = useSelector((state) => state.products);
-  const product = items.find((item) => String(item.id) === productId);
-  const isInCart = useSelector(selectIsInCart(Number(productId)));
+  const { selected: product, detailStatus: status, error } = useSelector((state) => state.products);
+  const isInCart = useSelector(selectIsInCart(product?._id));
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(BOTTLE_SIZES[1]);
+  const [selectedSku, setSelectedSku] = useState('');
 
   useEffect(() => {
-    if (status === 'idle') dispatch(loadProducts());
-  }, [dispatch, status]);
+    dispatch(loadProduct(productSlug));
+  }, [dispatch, productSlug]);
 
   if ((status === 'loading' || status === 'idle') && !product) {
     return (
@@ -58,12 +51,15 @@ export default function ProductDetailsPage() {
     );
   }
 
-  if (!product) return <Navigate to="/shop" replace />;
+  if (status === 'failed') return <Navigate to="/shop" replace state={{ error }} />;
+  if (!product || !product.variants?.length) return null;
 
-  const selectedPrice = Math.round(product.price * selectedSize.multiplier);
-  const selectedOriginalPrice = product.originalPrice
-    ? Math.round(product.originalPrice * selectedSize.multiplier)
-    : null;
+  const selectedSize = product.variants.find((variant) => variant.sku === selectedSku)
+    || product.variants.find((variant) => variant.label === '50 ml')
+    || product.variants[0];
+
+  const selectedPrice = selectedSize.price;
+  const selectedOriginalPrice = selectedSize.originalPrice || null;
 
   const addSelectedProduct = () => {
     if (isInCart) return;
@@ -72,6 +68,8 @@ export default function ProductDetailsPage() {
       price: selectedPrice,
       originalPrice: selectedOriginalPrice,
       selectedSize: selectedSize.label,
+      variantId: selectedSize._id,
+      sku: selectedSize.sku,
       quantity,
     }));
   };
@@ -139,12 +137,12 @@ export default function ProductDetailsPage() {
                     <span>{selectedSize.label} selected</span>
                   </div>
                   <div className="product-size-options">
-                    {BOTTLE_SIZES.map((size) => (
+                    {product.variants.map((size) => (
                       <button
                         key={size.label}
                         type="button"
                         className={selectedSize.label === size.label ? 'is-active' : ''}
-                        onClick={() => setSelectedSize(size)}
+                        onClick={() => setSelectedSku(size.sku)}
                         disabled={isInCart}
                       >
                         <span className="product-size-bottle">
@@ -152,7 +150,7 @@ export default function ProductDetailsPage() {
                         </span>
                         <span className="product-size-copy">
                           <strong>{size.label}</strong>
-                          <small>{formatPrice(Math.round(product.price * size.multiplier))}</small>
+                          <small>{formatPrice(size.price)}</small>
                         </span>
                         <i className="bi bi-check-circle-fill product-size-check" />
                       </button>
@@ -207,7 +205,7 @@ export default function ProductDetailsPage() {
                 </div>
               </section>
 
-              <ProductComments productName={product.name} />
+              <ProductComments productId={product._id} productName={product.name} />
             </div>
           </div>
         </section>

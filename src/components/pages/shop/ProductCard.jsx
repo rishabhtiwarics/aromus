@@ -26,7 +26,7 @@ export default function ProductCard({ product, variant = 'default' }) {
     badge,
   } = product;
 
-  const openProductDetails = () => navigate(`/shop/product/${product.id}`);
+  const openProductDetails = () => navigate(`/shop/product/${product.slug}`);
 
   const handleCardKeyDown = (event) => {
     if (event.target !== event.currentTarget) return;

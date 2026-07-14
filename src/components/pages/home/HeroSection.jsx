@@ -17,7 +17,7 @@ export default function HeroSection() {
   const timerRef = useRef(null);
   const progressRef = useRef(null);
 
-  const startTimer = (fromIndex) => {
+  const startTimer = () => {
     clearInterval(timerRef.current);
     clearInterval(progressRef.current);
     setProgress(0);
@@ -37,12 +37,13 @@ export default function HeroSection() {
 
   const goTo = (index) => {
     setActive(index);
-    startTimer(index);
+    startTimer();
   };
 
   useEffect(() => {
-    startTimer(0);
+    const start = setTimeout(startTimer, 0);
     return () => {
+      clearTimeout(start);
       clearInterval(timerRef.current);
       clearInterval(progressRef.current);
     };

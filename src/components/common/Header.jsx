@@ -131,7 +131,7 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    ['user', 'currentUser', 'authUser'].forEach((key) => localStorage.removeItem(key));
+    ['user', 'currentUser', 'authUser', 'aromus-token'].forEach((key) => localStorage.removeItem(key));
     setUser(null);
     closeSidebar();
   };
@@ -204,6 +204,7 @@ export default function Header() {
                         {user?.email && <span>{user.email}</span>}
                       </div>
                     </div>
+                    {user.role === 'admin' && <Link className="header-account-logout" to="/admin"><i className="bi bi-speedometer2" />Admin panel</Link>}
                     <button className="header-account-logout" type="button" onClick={handleLogout}>
                       <i className="bi bi-box-arrow-right" />
                       Logout
@@ -462,6 +463,7 @@ export default function Header() {
                     <i className="bi bi-box-arrow-right" />
                     Logout
                   </button>
+                  {user.role === 'admin' && <Link className="sidebar-auth-btn sidebar-login" to="/admin" onClick={closeSidebar}><i className="bi bi-speedometer2" /> Admin panel</Link>}
                 </>
               ) : (
                 <div className="sidebar-auth-actions">

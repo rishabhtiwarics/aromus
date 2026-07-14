@@ -9,6 +9,7 @@ import {
   selectCartItems,
   selectCartSubtotal,
 } from '../../../store/cartSlice';
+import { api, getToken } from '../../../api/client';
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('en-IN', {
@@ -17,12 +18,31 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const loadRazorpay = () => new Promise((resolve, reject) => {
+  if (window.Razorpay) { resolve(); return; }
+  const existing = document.querySelector('script[data-razorpay-checkout]');
+  if (existing) { existing.addEventListener('load', resolve, { once: true }); existing.addEventListener('error', () => reject(new Error('Unable to load Razorpay checkout.')), { once: true }); return; }
+  const script = document.createElement('script');
+  script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+  script.async = true;
+  script.dataset.razorpayCheckout = 'true';
+  script.onload = resolve;
+  script.onerror = () => reject(new Error('Unable to load Razorpay checkout. Check your connection and try again.'));
+  document.body.appendChild(script);
+});
+
 export default function CheckoutPage() {
   const dispatch = useDispatch();
   const items = useSelector(selectCartItems);
   const subtotal = useSelector(selectCartSubtotal);
+  const gstAmount = Math.round(subtotal * 0.18);
+  const shippingCharge = subtotal > 999 ? 0 : 99;
+  const checkoutTotal = subtotal + gstAmount + shippingCharge;
   const formRef = useRef(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [pendingRazorpayOrder, setPendingRazorpayOrder] = useState(null);
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -32,7 +52,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     postalCode: '',
-    paymentMethod: 'razorpay',
+    paymentMethod: 'cod',
   });
 
   const steps = [
@@ -59,14 +79,53 @@ export default function CheckoutPage() {
     setActiveStep((step) => Math.min(step + 1, 3));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (activeStep < 3) {
       goToNextStep();
       return;
     }
-    dispatch(clearCart());
-    setOrderPlaced(true);
+    if (!getToken()) { setOrderError('Please sign in before placing your order.'); return; }
+    setSubmitting(true); setOrderError('');
+    try {
+      const orderResponse = formData.paymentMethod === 'razorpay' && pendingRazorpayOrder
+        ? { data: { _id: pendingRazorpayOrder } }
+        : await api.post('/order', {
+          items: items.map((item) => ({ product: item._id || item.id, variant: item.variantId, quantity: item.quantity })),
+          shippingAddress: { addressLine1: formData.address, city: formData.city, state: formData.state, pinCode: formData.postalCode, country: 'India' },
+          paymentMethod: formData.paymentMethod,
+        });
+      if (formData.paymentMethod === 'razorpay') {
+        setPendingRazorpayOrder(orderResponse.data._id);
+        await loadRazorpay();
+        const paymentResponse = await api.post('/payment/create-order', { orderId: orderResponse.data._id });
+        const payment = paymentResponse.data;
+        await new Promise((resolve, reject) => {
+          const checkout = new window.Razorpay({
+            key: payment.keyId,
+            amount: payment.amount,
+            currency: payment.currency,
+            name: 'Aromus Parfum',
+            description: `Order ${String(payment.aromusOrderId).slice(-8)}`,
+            order_id: payment.orderId,
+            prefill: { name: formData.name, email: formData.email, contact: formData.phone },
+            theme: { color: '#C9963E' },
+            modal: { ondismiss: () => reject(new Error('Payment was cancelled. Your order remains pending.')) },
+            handler: async (response) => {
+              try {
+                await api.post('/payment/verify', { aromusOrderId: payment.aromusOrderId, ...response });
+                resolve();
+              } catch (error) { reject(error); }
+            },
+          });
+          checkout.on('payment.failed', (response) => reject(new Error(response.error?.description || 'Razorpay payment failed.')));
+          checkout.open();
+        });
+      }
+      setPendingRazorpayOrder(null);
+      dispatch(clearCart()); setOrderPlaced(true);
+    } catch (error) { setOrderError(error.message); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -110,6 +169,7 @@ export default function CheckoutPage() {
                       </button>
                     ))}
                   </div>
+                  {orderError && <p className="shop-error">{orderError}</p>}
 
                   {activeStep === 1 && (
                     <div className="checkout-step-panel" data-checkout-step="1">
@@ -357,11 +417,12 @@ export default function CheckoutPage() {
                     </div>
                     <div className="order-summary-lines">
                       <div><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div>
-                      <div><span>Shipping</span><strong>Free</strong></div>
+                      <div><span>GST (18%)</span><strong>{formatPrice(gstAmount)}</strong></div>
+                      <div><span>Shipping</span><strong>{shippingCharge ? formatPrice(shippingCharge) : 'Free'}</strong></div>
                     </div>
                     <div className="order-summary-total">
                       <span>Total</span>
-                      <strong>{formatPrice(subtotal)}</strong>
+                      <strong>{formatPrice(checkoutTotal)}</strong>
                     </div>
                     <div className="cart-order-assurance">
                       <i className="bi bi-shield-lock" aria-hidden="true" />
@@ -377,8 +438,9 @@ export default function CheckoutPage() {
                         className="commerce-primary-button"
                         type={activeStep === 3 ? 'submit' : 'button'}
                         onClick={activeStep < 3 ? goToNextStep : undefined}
+                        disabled={submitting}
                       >
-                        {activeStep === 3
+                        {submitting ? 'Placing order...' : activeStep === 3
                           ? (formData.paymentMethod === 'razorpay' ? 'Pay with Razorpay' : 'Place COD order')
                           : 'Continue checkout'}
                         <i className={`bi ${activeStep === 3 ? 'bi-lock' : 'bi-arrow-right'}`} />

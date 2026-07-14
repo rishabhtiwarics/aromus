@@ -1,5 +1,3 @@
-import React from 'react';
-
 const TRUST_ITEMS = [
   {
     title: 'Long Lasting',

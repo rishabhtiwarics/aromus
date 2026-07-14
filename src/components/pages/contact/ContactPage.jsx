@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../common/Header';
 import Footer from '../../common/Footer';
+import { api } from '../../../api/client';
 
 const CONTACT_ITEMS = [
   {
@@ -30,9 +32,13 @@ const CONTACT_ITEMS = [
 ];
 
 export default function ContactPage() {
-  const handleSubmit = (event) => {
+  const [status, setStatus] = useState('');
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    event.currentTarget.reset();
+    const form = event.currentTarget;
+    const values = Object.fromEntries(new FormData(form));
+    try { await api.post('/contact', values); setStatus('Your message has been sent.'); form.reset(); }
+    catch (error) { setStatus(error.message); }
   };
 
   return (
@@ -86,6 +92,7 @@ export default function ContactPage() {
                   Send Now
                   <i className="bi bi-arrow-right" aria-hidden="true" />
                 </button>
+                {status && <p className="contact-section-kicker">{status}</p>}
               </form>
             </div>
 

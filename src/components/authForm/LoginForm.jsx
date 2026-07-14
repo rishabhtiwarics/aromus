@@ -2,6 +2,7 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthField from './AuthField';
+import { api } from '../../api/client';
 
 const validationSchema = Yup.object({
   email: Yup.string().email('Enter a valid email').required('Email is required'),
@@ -15,13 +16,17 @@ export default function LoginForm() {
     <Formik
       initialValues={{ email: '', password: '' }}
       validationSchema={validationSchema}
-      onSubmit={(values, { setSubmitting }) => {
-        localStorage.setItem('user', JSON.stringify({ email: values.email }));
-        setSubmitting(false);
-        navigate('/');
+      onSubmit={async (values, { setSubmitting, setStatus }) => {
+        try {
+          const response = await api.post('/user/login', values);
+          localStorage.setItem('aromus-token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.data));
+          navigate('/');
+        } catch (error) { setStatus(error.message); }
+        finally { setSubmitting(false); }
       }}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, status }) => (
         <Form className="auth-form">
           <Field
             name="email"
@@ -31,6 +36,7 @@ export default function LoginForm() {
             placeholder="you@example.com"
             component={AuthField}
           />
+          {status && <p className="shop-error">{status}</p>}
           <Field
             name="password"
             type="password"

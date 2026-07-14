@@ -8,7 +8,7 @@ import { loadProducts } from '../../../store/productsSlice';
 export default function LatestProductsSection() {
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.products);
-  const products = items.slice(-3);
+  const products = items.filter((product) => product.isNewArrival).slice(0, 3);
 
   useEffect(() => {
     if (status === 'idle') dispatch(loadProducts());
